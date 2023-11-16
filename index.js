@@ -16,6 +16,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //Chạy mongoose
 dbConfig();
+//Cài đặt route
+const EmployeeRouter = require("./routers/EmployeeRouter.js");
+
+app.use("api/employee", EmployeeRouter);
 
 //Kết nối với server
 app.listen(PORT, () => {
