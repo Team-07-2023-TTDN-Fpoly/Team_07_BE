@@ -18,8 +18,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 dbConfig();
 //Cài đặt route
 const EmployeeRouter = require("./routers/EmployeeRouter.js");
+const CustomerRouter = require("./routers/CustomerRouter.js");
 
 app.use("api/employee", EmployeeRouter);
+app.use("api/employee", CustomerRouter);
 
 //Kết nối với server
 app.listen(PORT, () => {
