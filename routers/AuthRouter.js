@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const AuthController = require("../controllers/AuthController.js");
-const AdminMiddleware = require("../middleware/AdminMiddleware.js");
 
 //quản lý thay đổi mật khẩu nhân viên
 router.put("/change/password/:id", AuthController.adminChangePassword);
