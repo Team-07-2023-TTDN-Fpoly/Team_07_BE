@@ -156,9 +156,25 @@ class EmployeeController {
 
   // Lấy danh sách tất cả nhân viên
   static async getAllEmployees(req, res) {
+    const { search } = req.query;
+    console.log(search);
     try {
+      let filter = {};
+      let employeeIds = [];
+      if (search) {
+        const employees = await Employee.find({
+          emp_name: { $regex: search, $options: "i" },
+        }).select("_id");
+        //danh sách id employee
+        for (let i = 0; i < employees.length; i++) {
+          employeeIds.push(employees[i]._id);
+        }
+      }
+      if (employeeIds.length > 0) {
+        filter["emp_id"] = { $in: employeeIds };
+      }
       // Lấy tất cả bản ghi từ Authentication và populate thông tin Employee
-      const authList = await Authentication.find().populate({
+      const authList = await Authentication.find(filter).populate({
         path: "emp_id",
         select:
           "emp_name emp_phone emp_address emp_birthday role workShiftId join_date basic_salary", // chỉ định các trường bạn muốn lấy từ Employee
@@ -167,6 +183,8 @@ class EmployeeController {
           model: "WorkShift",
         },
       });
+      console.log(authList);
+
       // Xây dựng danh sách thông tin nhân viên với thông tin xác thực
       const employeeList = authList.map((auth) => {
         const employeeData = auth.emp_id ? auth.emp_id.toObject() : {};
