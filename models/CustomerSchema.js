@@ -15,6 +15,13 @@ const customerSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    cus_email: {
+      type: String,
+      required: true,
+      unique:true,
+      lowercase: true,
+    },
+
     cus_birthday: {
       type: Date,
       default: null,

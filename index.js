@@ -19,13 +19,16 @@ app.use(cors());
 const AuthRouter = require("./routers/AuthRouter.js");
 const EmployeeRouter = require("./routers/EmployeeRouter.js");
 const WorkShiftRouter = require("./routers/WorkShiftRouter.js");
+const CustomerRouter = require("./routers/CustomerRouter.js");
 
 app.use("/api/auth", AuthRouter);
 app.use("/api/employee", EmployeeRouter);
 app.use("/api/workshift", WorkShiftRouter);
+app.use("api/employee", CustomerRouter);
 
 //Chạy mongoose
 dbConfig();
+
 //Kết nối với server
 app.listen(PORT, () => {
   console.log(`Server đang chạy trên cổng ${PORT}...`);

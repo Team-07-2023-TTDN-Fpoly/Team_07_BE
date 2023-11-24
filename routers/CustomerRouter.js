@@ -7,7 +7,7 @@ router.get("/:id", CustomerController.getCustomerById);
 // Get all Customers
 router.get("/", CustomerController.getAllCustomers);
 // Create a new Customer
-router.post("/", CustomerController.createCustomerAndUser);
+router.post("/", CustomerController.createCustomer);
 // Update Customer information
 router.put("/information/:id", CustomerController.updateCustomer);
 
