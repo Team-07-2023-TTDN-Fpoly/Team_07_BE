@@ -48,6 +48,38 @@ class AuthenticationController {
       res.status(400).json({ message: error.message });
     }
   }
-}
+  // Đăng nhập tài khoản
+  static async loginAccount(req, res){
+    try{
+      const { email, password } = req.body;
+      //check email
+      const auth = await Authentication.findOne({ email });
+      if (!auth) {
+        return res.status(401).json({ message: "Email không đúng." });
+      }
+      //check mật khẩu
+      const check = await bcrypt.compare(password, auth.salt);
+      if (!check) {
+        return res.status(401).json({ message: "Mật khẩu không đúng." });
+      }
+      if (auth.is_disable) {
+        return res.status(401).json({ message: "Tài khoản đã bị vô hiệu hóa." });
+      }
+      if (!auth.is_disable) {
+        // Kiểm tra phân quyền
+        if (auth.role === "admin") {
+          res.status(200).json({ message: "Đăng nhập thành công - Quyền admin", auth});
+        } else if (auth.role === "employee") {
+          res.status(200).json({ message: "Đăng nhập thành công - Quyền nhân viên", auth});
+        }
+      }
 
+      res.status(200).json({ message: "Đăng nhập thành công", auth});
+
+    }catch{
+      console.error(error);
+      return res.status(500).json({ message: "Đã xảy ra lỗi khi đăng nhập." });
+    }
+  }
+}
 module.exports = AuthenticationController;
