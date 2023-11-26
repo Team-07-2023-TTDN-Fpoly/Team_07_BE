@@ -3,7 +3,7 @@ const router = express.Router();
 const WorkShiftController = require("../controllers/WorkShiftController.js");
 
 //Get one WorkShift
-// router.get("/:id", WorkShiftController.get);
+router.get("/:id", WorkShiftController.getWorkShift);
 //Get all WorkShift
 router.get("/", WorkShiftController.getAllWorkShift);
 //create new WorkShift
