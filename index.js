@@ -1,6 +1,8 @@
 const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
+const session = require("express-session");
+
 const bodyParser = require("body-parser");
 
 const dbConfig = require("./config/mongooseConfig.js");
@@ -15,6 +17,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
+app.use(
+  session({
+    secret: "dress_hub",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, maxAge: 60 * 60 * 1000 * 24 },
+  })
+);
 //Cài đặt route
 const AuthRouter = require("./routers/AuthRouter.js");
 const EmployeeRouter = require("./routers/EmployeeRouter.js");
@@ -23,7 +33,10 @@ const CustomerRouter = require("./routers/CustomerRouter.js");
 const DressRouter = require("./routers/DressRouter.js");
 const DressTypeRouter = require("./routers/DressTypeRouter.js");
 const ContractRouter = require("./routers/ContractRouter.js");
+const AuthMiddleware = require("./middleware/AuthMiddleware.js");
+const AdminMiddleware = require("./middleware/AdminMiddleware.js");
 
+//
 app.use("/api/auth", AuthRouter);
 app.use("/api/employee", EmployeeRouter);
 app.use("/api/workshift", WorkShiftRouter);

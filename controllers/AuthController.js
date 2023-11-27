@@ -1,6 +1,6 @@
 const Authentication = require("../models/AuthenticationSchema.js");
 const bcrypt = require("bcryptjs");
-
+const { formatEmployeeData } = require("../utils/FormatEmployeeData.js");
 class AuthenticationController {
   // Hàm cho người quản lý thay đổi mật khẩu nhân viên
   static async adminChangePassword(req, res) {
@@ -49,34 +49,46 @@ class AuthenticationController {
     }
   }
   // Đăng nhập tài khoản
-  static async loginAccount(req, res){
-    try{
+  static async loginAccount(req, res) {
+    try {
       const { email, password } = req.body;
       //check email
-      const auth = await Authentication.findOne({ email });
+      const auth = await Authentication.findOne({ email: email });
       if (!auth) {
         return res.status(401).json({ message: "Email không đúng." });
       }
       //check mật khẩu
-      const check = await bcrypt.compare(password, auth.salt);
+      const hash_password = bcrypt.hashSync(password, auth.salt);
+      const check = bcrypt.compare(hash_password, auth.hash_password);
+
       if (!check) {
         return res.status(401).json({ message: "Mật khẩu không đúng." });
       }
-      if (auth.is_disable) {
-        return res.status(401).json({ message: "Tài khoản đã bị vô hiệu hóa." });
-      }
-      if (!auth.is_disable) {
-        // Kiểm tra phân quyền
-        if (auth.role === "admin") {
-          res.status(200).json({ message: "Đăng nhập thành công - Quyền admin", auth});
-        } else if (auth.role === "employee") {
-          res.status(200).json({ message: "Đăng nhập thành công - Quyền nhân viên", auth});
-        }
+
+      const user = await Authentication.findOne({
+        emp_id: auth.emp_id,
+      }).populate({
+        path: "emp_id",
+        select:
+          "emp_name emp_phone emp_address emp_birthday role workShiftId join_date basic_salary", // chỉ định các trường bạn muốn lấy từ Employee
+        populate: {
+          path: "workShiftId",
+          model: "WorkShift",
+        },
+      });
+
+      // Kiểm tra xem tài khoản có bị vô hiệu hóa không
+      if (user.is_disable) {
+        return res
+          .status(400)
+          .json({ message: "Tài khoản của bạn đã bị vô hiệu hóa!" });
       }
 
-      res.status(200).json({ message: "Đăng nhập thành công", auth});
-
-    }catch{
+      // Nếu tài khoản hợp lệ, lưu thông tin nhân viên vào session
+      const employeeData = formatEmployeeData(user);
+      req.session.user = employeeData;
+      res.status(200).json({ data: employeeData });
+    } catch {
       console.error(error);
       return res.status(500).json({ message: "Đã xảy ra lỗi khi đăng nhập." });
     }
