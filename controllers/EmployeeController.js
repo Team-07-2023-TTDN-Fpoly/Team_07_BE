@@ -14,29 +14,32 @@ class EmployeeController {
       // Kiểm tra email tồn tại trong Authentication
 
       // Validate tên nhân viên
-      if (validator.isEmpty(employeeData.emp_name)) {
+      if (!employeeData.emp_name || validator.isEmpty(employeeData.emp_name)) {
         return res
           .status(400)
           .json({ message: "Tên nhân viên không được để trống." });
       }
 
       // Validate số điện thoại
-      if (!validator.isLength(employeeData.emp_phone, { min: 10, max: 10 })) {
+      if (
+        !employeeData.emp_phone ||
+        !validator.isLength(employeeData.emp_phone, { min: 10, max: 10 })
+      ) {
         return res.status(400).json({ message: "Số điện thoại không hợp lệ." });
       }
       // Validate email
-      if (!validator.isEmail(email)) {
+      if (!email || !validator.isEmail(email)) {
         return res.status(400).json({ message: "Email không hợp lệ." });
       }
 
       // Validate password (ví dụ: độ dài tối thiểu là 6)
-      if (!validator.isLength(password, { min: 6 })) {
+      if (!password || !validator.isLength(password, { min: 6 })) {
         return res
           .status(400)
           .json({ message: "Mật khẩu phải có ít nhất 6 ký tự." });
       }
       //validaotr lương
-      if (isNaN(employeeData.basic_salary)) {
+      if (!employeeData.basic_salary || isNaN(employeeData.basic_salary)) {
         return res.status(400).json({ message: "Vui lòng nhập lương." });
       }
 
@@ -79,18 +82,21 @@ class EmployeeController {
       const { id } = req.params;
       const { ...employeeData } = req.body;
       // Validate tên nhân viên
-      if (validator.isEmpty(employeeData.emp_name)) {
+      if (!employeeData.emp_name || validator.isEmpty(employeeData.emp_name)) {
         return res
           .status(400)
           .json({ message: "Tên nhân viên không được để trống." });
       }
 
       // Validate số điện thoại
-      if (!validator.isLength(employeeData.emp_phone, { min: 10, max: 10 })) {
+      if (
+        !employeeData.emp_phone ||
+        !validator.isLength(employeeData.emp_phone, { min: 10, max: 10 })
+      ) {
         return res.status(400).json({ message: "Số điện thoại không hợp lệ." });
       }
       //validaotr lương
-      if (isNaN(employeeData.basic_salary)) {
+      if (!employeeData.basic_salary || isNaN(employeeData.basic_salary)) {
         return res.status(400).json({ message: "Vui lòng nhập lương." });
       }
       const employee = await Employee.findByIdAndUpdate(id, employeeData, {
@@ -101,6 +107,7 @@ class EmployeeController {
       }
       res.status(200).json({ data: "Thay đổi thông tin thành công!" });
     } catch (error) {
+      console.log(error);
       res.status(400).json({ message: error.message });
     }
   }
