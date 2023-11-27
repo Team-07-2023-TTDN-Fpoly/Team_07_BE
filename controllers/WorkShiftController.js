@@ -4,8 +4,10 @@ const validator = require("validator"); // dùng để kiểm tra dữ liệu
 class WorkShiftController {
   static async createWorkShift(req, res) {
     const { name, timeStart, timeEnd, shift_description } = req.body;
-    console.log(req.body);
     try {
+      if (!name) {
+        res.status(400).json({ message: "Vui lòng nhập tên ca làm!" });
+      }
       const workShift = await WorkShift({
         name,
         timeStart,
@@ -22,19 +24,22 @@ class WorkShiftController {
 
   static async updateWorkShift(req, res) {
     const { id } = req.params;
-    const { ...data } = req.body;
+    const { name, timeStart, timeEnd, shift_description } = req.body;
     try {
       const workShift = await WorkShift.findByIdAndUpdate(
         id,
         {
-          ...data,
+          name: name,
+          timeStart: timeStart,
+          timeEnd: timeEnd,
+          shift_description: shift_description,
         },
         { new: true }
       );
       if (!workShift) {
         return res.status(404).json({ message: "Ca làm không tồn tại" });
       }
-      res.status(200).json({ data: workShift._id });
+      res.status(200).json({ message: "Cập nhật thành công" });
     } catch (error) {
       res.status(400).json({ message: error.message });
     }
@@ -53,6 +58,26 @@ class WorkShiftController {
         };
       });
       res.status(200).json({ data: list });
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  static async getWorkShift(req, res) {
+    try {
+      const workShift = await WorkShift.findByIdId(req.params.id);
+      if (!workShift) {
+        return res.status(400).json({ message: "Không tìm thấy ca làm" });
+      }
+      res.status(200).json({
+        data: {
+          shift_id: workShift.id,
+          name: workShift.name,
+          timeStart: workShift.timeStart,
+          timeEnd: workShift.timeEnd,
+          shift_description: workShift.shift_description,
+        },
+      });
     } catch (error) {
       res.status(400).json({ message: error.message });
     }
