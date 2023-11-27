@@ -8,10 +8,7 @@ const CustomerController = {
     try {
       const { cus_name, cus_phone, cus_phoneSecond, cus_email, cus_wedding_date, cus_address } = req.body;
   
-      // Validate tên khách hàng
-      if (!cus_name || cus_name.trim() === "") {
-        return res.status(400).json({ message: "Tên khách hàng không được để trống." });
-      }
+     
   
       // Validate số điện thoại
       if (!cus_phone || !validator.isLength(cus_phone, { min: 10, max: 10 })) {
@@ -22,7 +19,10 @@ const CustomerController = {
       if (!cus_email || !validator.isEmail(cus_email)) {
         return res.status(400).json({ message: "Email không hợp lệ." });
       }
-  
+   // Validate tên khách hàng
+      if (!cus_name || cus_name.trim() === "") {
+        return res.status(400).json({ message: "Tên khách hàng không được để trống." });
+      }
       // Tạo khách hàng mới
       const customer = new Customer({
         cus_name,
@@ -115,7 +115,7 @@ const CustomerController = {
     }
   },
 
-  // Lấy danh sách tất cả nhân viên
+  // Lấy danh sách tất cả khach hang
   getAllCustomers: async (req, res) => {
     try {
       // Lấy tất cả bản ghi từ Customer
