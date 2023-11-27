@@ -22,7 +22,7 @@ const CustomerRouter = require("./routers/CustomerRouter.js");
 
 app.use("/api/employee", EmployeeRouter);
 app.use("/api/workshift", WorkShiftRouter);
-app.use("api/employee", CustomerRouter);
+app.use("/api/customer", CustomerRouter);
 
 //Chạy mongoose
 dbConfig();
