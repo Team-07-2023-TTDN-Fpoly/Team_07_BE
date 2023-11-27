@@ -22,7 +22,7 @@ const customerSchema = new mongoose.Schema(
       lowercase: true,
     },
 
-    cus_birthday: {
+    cus_wedding_date: {
       type: Date,
       default: null,
     },
