@@ -6,7 +6,7 @@ const ContractController = require("../controllers/ContractController.js");
 //get one contract
 // router.get("/:id", ContractController.getContact);
 //get all contract
-// router.get("/", ContractController.getAllContractes);
+router.get("/", ContractController.getAllContracts);
 //Thêm mới một contract
 router.post("/", ContractController.createContract);
 //thay đổi thông tin một contract
