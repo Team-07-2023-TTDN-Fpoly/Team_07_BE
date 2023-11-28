@@ -157,7 +157,7 @@ const CustomerController = {
       const { id } = req.params;
 
       // Xóa khách hàng
-      const customerDeletionResult = await Customer.findByIdAndDelete(
+      const customerDeletionResult = await Customer.findByIdAndUpdate(
         id,
         { hidden: true },
         { new: true }
