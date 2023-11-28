@@ -18,7 +18,7 @@ const customerSchema = new mongoose.Schema(
     cus_email: {
       type: String,
       required: true,
-      unique:true,
+      unique: true,
       lowercase: true,
     },
 
@@ -29,6 +29,10 @@ const customerSchema = new mongoose.Schema(
     cus_address: {
       type: String,
       default: "",
+    },
+    hidden: {
+      type: Boolean,
+      default: false,
     },
   },
   {

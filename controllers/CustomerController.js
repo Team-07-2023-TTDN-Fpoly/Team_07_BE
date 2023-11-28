@@ -115,7 +115,7 @@ const CustomerController = {
       const { id } = req.params;
       const customer = await Customer.findById(id);
 
-      if (!customer) {
+      if (!customer || customer.hidden) {
         return res.status(404).json({ message: "Khách hàng không tồn tại" });
       }
 
@@ -129,9 +129,16 @@ const CustomerController = {
 
   // Lấy danh sách tất cả khach hang
   getAllCustomers: async (req, res) => {
+    const { search } = req.query;
     try {
+      let query = { hidden: false };
+      //Tìm kiếm theo tên
+      if (search) {
+        query.cus_name = { $regex: search, $options: "i" }; // 'i' không phân biệt hoa thường
+      }
+      //
       // Lấy tất cả bản ghi từ Customer
-      const customerList = await Customer.find();
+      const customerList = await Customer.find(query);
 
       // Xây dựng danh sách khách hàng
       const formattedCustomerList = customerList.map((customer) => {
@@ -150,7 +157,11 @@ const CustomerController = {
       const { id } = req.params;
 
       // Xóa khách hàng
-      const customerDeletionResult = await Customer.findByIdAndDelete(id);
+      const customerDeletionResult = await Customer.findByIdAndUpdate(
+        id,
+        { hidden: true },
+        { new: true }
+      );
       if (!customerDeletionResult) {
         throw new Error("Không tìm thấy khách hàng để xóa.");
       }

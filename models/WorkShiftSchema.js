@@ -17,7 +17,11 @@ const workShiftSchema = new mongoose.Schema(
     },
     shift_description: {
       type: String,
-      default:''
+      default: "",
+    },
+    hidden: {
+      type: Boolean,
+      default: false,
     },
   },
   {

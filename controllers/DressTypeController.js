@@ -39,11 +39,18 @@ class DressTypeController {
   }
 
   static async getAllDressType(req, res) {
+    const { search } = req.query;
     try {
-      const dressTypes = await DressType.find();
+      //Tìm kiếm các loại áo đang còn được sử dụng
+      let query = { hidden: false };
+      if (search) {
+        query.type_name = { $regex: search,$options: "i" }; // 'i' không phân biệt hoa thường
+      }
+
+      const dressTypes = await DressType.find(query);
       const list = dressTypes.map((dressType) => {
         return {
-          type_id: dressType.id,
+          type_id: dressType._id,
           type_name: dressType.type_name,
         };
       });
@@ -54,19 +61,35 @@ class DressTypeController {
   }
   static async getDressType(req, res) {
     try {
-      const dressType = await DressType.find();
-      if (!dressType) {
+      const dressType = await DressType.findById(req.params.id);
+      if (!dressType || dressType.hidden) {
         return res.status(400).json({ message: "Không tìm thấy loại áo" });
       }
 
       res.status(200).json({
         data: {
-          type_id: dressType.id,
+          type_id: dressType._id,
           type_name: dressType.type_name,
         },
       });
     } catch (error) {
       res.status(400).json({ message: error.message });
+    }
+  }
+  static async deleteDressType(req, res) {
+    try {
+      const dress = await DressType.findByIdAndUpdate(
+        req.params.id,
+        { hidden: true },
+        { new: true }
+      );
+      if (!dress) {
+        return res.status(400).json({ message: "Loại áo cưới không tồn tại!" });
+      }
+
+      res.status(200).json({ message: "Loại áo cưới đã được xóa" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   }
 }
