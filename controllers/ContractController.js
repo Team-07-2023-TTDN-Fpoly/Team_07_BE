@@ -1,13 +1,13 @@
 const Contract = require("../models/ContractSchema.js");
 const ContractDetail = require("../models/ContractDetailSchema.js");
 const Dress = require("../models/DressSchema.js");
-
+const { formatContractData } = require("../utils/FormatContractData");
 class ContractController {
   //Tạo mới contract
   static async createContract(req, res) {
     const {
       cus_id,
-      emp_id,
+      auth_id,
       createAt,
       endAt,
       total_amount,
@@ -49,7 +49,7 @@ class ContractController {
       // Tạo Contract mới
       const newContract = new Contract({
         cus_id: cus_id,
-        emp_id: emp_id,
+        emp_id: auth_id,
         contract_details: savedDetails.map((detail) => detail._id),
         createAt: createAt,
         endAt: endAt,
@@ -64,6 +64,44 @@ class ContractController {
       res.status(201).json({ contract: savedContract._id });
     } catch (err) {
       res.status(500).json({ message: err.message });
+    }
+  }
+
+  static async getAllContracts(req, res) {
+    try {
+      const listContract = await Contract.find({})
+        .populate({ path: "cus_id", model: "Customer" })
+        .populate({
+          path: "emp_id",
+          model: "Authentication",
+          populate: {
+            path: "emp_id",
+            model: "Employee",
+            populate: {
+              path: "workShiftId",
+              model: "WorkShift",
+            },
+          },
+        })
+        .populate({
+          path: "contract_details",
+          model: "ContractDetail",
+          populate: {
+            path: "dress_id",
+            model: "Dress",
+            populate: {
+              path: "dressTypeId",
+              model: "DressType",
+            },
+          },
+        })
+        .lean();
+      const list = listContract.map((contract) => {
+        return formatContractData(contract);
+      });
+      res.status(200).json({ data: list });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   }
 }

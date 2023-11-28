@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const contractDetailSchema = require("./ContractDetailSchema");
 const contractSchema = new mongoose.Schema(
   {
     cus_id: {
@@ -8,9 +7,14 @@ const contractSchema = new mongoose.Schema(
     },
     emp_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Employee",
+      ref: "Authentication",
     },
-    contract_details: [contractDetailSchema],
+    contract_details: [
+      {
+        type: mongoose.Schema.Types.ObjectId, // Thay đổi kiểu dữ liệu này
+        ref: "ContractDetail", // Tham chiếu đến model ContractDetail
+      },
+    ],
     createAt: {
       type: Date,
       require: true,
@@ -21,6 +25,7 @@ const contractSchema = new mongoose.Schema(
     },
     total_amount: {
       type: Number,
+      default: 0,
     },
     prepay: {
       type: Number,

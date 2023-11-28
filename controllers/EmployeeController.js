@@ -159,16 +159,15 @@ class EmployeeController {
       // Lấy tất cả bản ghi từ Authentication và populate thông tin Employee
       const authList = await Authentication.find(filter).populate({
         path: "emp_id",
-        select:
-          "emp_name emp_phone emp_address emp_birthday role workShiftId join_date basic_salary", // chỉ định các trường bạn muốn lấy từ Employee
+        model: "Employee",
         populate: {
           path: "workShiftId",
           model: "WorkShift",
         },
       });
-
       // Xây dựng danh sách thông tin nhân viên với thông tin xác thực
       const employeeList = authList.map((auth) => {
+        console.log(auth);
         return formatEmployeeData(auth);
       });
       res.status(200).json({ data: employeeList });
