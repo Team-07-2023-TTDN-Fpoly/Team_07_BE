@@ -16,6 +16,9 @@ const DressController = {
           model: "DressType",
         })
         .lean();
+      if (!dress || dress.hidden) {
+        return res.status(400).json({ message: "Không tìm thấy áo cưới!" });
+      }
       const responseData = formatDressData(dress);
       res.status(200).json({
         data: responseData,
@@ -25,8 +28,15 @@ const DressController = {
     }
   },
   getAllDresses: async (req, res) => {
+    const { search } = req.query;
     try {
-      const dresses = await Dress.find()
+      let query = { hidden: false };
+      //Tìm kiếm theo tên
+      if (search) {
+        query.dress_name = { $regex: search, $options: "i" }; // 'i' không phân biệt hoa thường
+      }
+      //
+      const dresses = await Dress.find(query)
         .populate({
           path: "dressTypeId",
           model: "DressType",
@@ -116,19 +126,16 @@ const DressController = {
 
   deleteDress: async (req, res) => {
     try {
-      const dress = await Dress.findById(req.params.id);
+      const dress = await Dress.findByIdAndUpdate(
+        req.params.id,
+        { hidden: true },
+        { new: true }
+      );
       if (!dress) {
         return res.status(400).json({ message: "Áo cưới không tồn tại!" });
       }
-      // Đối với việc xóa ảnh, bạn cần lấy public_id từ URL
-      const parts = dress.dress_image.split("/");
-      const fileName = parts.pop(); // Lấy phần cuối cùng của URL
-      const publicId = fileName.split(".")[0]; // Loại bỏ phần mở rộng
 
-      await cloudinary.uploader.destroy(publicId);
-
-      await dress.remove();
-      res.json({ message: "Dress removed" });
+      res.status(200).json({ message: "Áo cưới đã được xóa" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

@@ -46,7 +46,14 @@ class WorkShiftController {
   }
 
   static async getAllWorkShift(req, res) {
+    const { search } = req.query;
     try {
+      let query = { hidden: false };
+      //Tìm kiếm theo tên
+      if (search) {
+        query.name = { $regex: search, $options: "i" }; // 'i' không phân biệt hoa thường
+      }
+      //
       const workShifts = await WorkShift.find();
       const list = workShifts.map((workShift) => {
         return {
@@ -80,6 +87,22 @@ class WorkShiftController {
       });
     } catch (error) {
       res.status(400).json({ message: error.message });
+    }
+  }
+  static async deleteWorkShift(req, res) {
+    try {
+      const dress = await WorkShift.findByIdAndUpdate(
+        req.params.id,
+        { hidden: true },
+        { new: true }
+      );
+      if (!dress) {
+        return res.status(400).json({ message: "Ca làm không tồn tại!" });
+      }
+
+      res.status(200).json({ message: "Ca làm đã được xóa" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   }
 }

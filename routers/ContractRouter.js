@@ -12,6 +12,6 @@ router.post("/", ContractController.createContract);
 //thay đổi thông tin một contract
 // router.put("/:id", ContractController.updateContract);
 //xóa một contract
-// router.delete("/:id", ContractController.deleteContract);
+router.delete("/:id", ContractController.deleteContract);
 
 module.exports = router;

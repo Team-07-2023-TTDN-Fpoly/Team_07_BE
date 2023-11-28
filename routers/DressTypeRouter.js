@@ -10,5 +10,7 @@ router.get("/", DressTypeController.getAllDressType);
 router.post("/", DressTypeController.createDressType);
 //update information DressType
 router.put("/:id", DressTypeController.updateDressType);
+//Delete DressType
+router.delete("/:id", DressTypeController.deleteDressType);
 
 module.exports = router;
