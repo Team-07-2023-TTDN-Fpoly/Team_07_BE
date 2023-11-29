@@ -1,13 +1,15 @@
 const Contract = require("../models/ContractSchema.js");
 const ContractDetail = require("../models/ContractDetailSchema.js");
 const Dress = require("../models/DressSchema.js");
+const Customer = require("../models/CustomerSchema.js");
 
+const { formatContractData } = require("../utils/FormatContractData");
 class ContractController {
   //Tạo mới contract
   static async createContract(req, res) {
     const {
       cus_id,
-      emp_id,
+      auth_id,
       createAt,
       endAt,
       total_amount,
@@ -49,7 +51,7 @@ class ContractController {
       // Tạo Contract mới
       const newContract = new Contract({
         cus_id: cus_id,
-        emp_id: emp_id,
+        emp_id: auth_id,
         contract_details: savedDetails.map((detail) => detail._id),
         createAt: createAt,
         endAt: endAt,
@@ -64,6 +66,86 @@ class ContractController {
       res.status(201).json({ contract: savedContract._id });
     } catch (err) {
       res.status(500).json({ message: err.message });
+    }
+  }
+
+  static async getAllContracts(req, res) {
+    // const { search } = req.query;
+    try {
+      //search
+      // let listCustomerIds = [];
+      let filter = { hidden: false };
+
+      // if (search) {
+      //   const customers = await Customer.find({
+      //     cus_name: { $regex: search, $options: "i" },
+      //   }).select("_id"); //trả về danh sách id của customer
+
+      //   //danh sách id employee
+      //   for (let i = 0; i < customers.length; i++) {
+      //     listCustomerIds.push(customers[i]._id);
+      //   }
+      // }
+      // //Kiểm tra xem có khách hàng nào không
+      // if (listCustomerIds.length > 0) {
+      //   filter["cus_id"] = { $in: listCustomerIds };
+      // }
+
+      const listContract = await Contract.find(filter)
+        .populate({ path: "cus_id", model: "Customer" })
+        .populate({
+          path: "emp_id",
+          model: "Authentication",
+          populate: {
+            path: "emp_id",
+            model: "Employee",
+            populate: {
+              path: "workShiftId",
+              model: "WorkShift",
+            },
+          },
+        })
+        .populate({
+          path: "contract_details",
+          model: "ContractDetail",
+          populate: {
+            path: "dress_id",
+            model: "Dress",
+            populate: {
+              path: "dressTypeId",
+              model: "DressType",
+            },
+          },
+        })
+        .lean();
+      const list = listContract.map((contract) => {
+        return formatContractData(contract);
+      });
+      res.status(200).json({ data: list });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  // Xóa hợp đồng
+  static async deleteContract(req, res) {
+    try {
+      const { id } = req.params;
+
+      // Xóa hợp đồng
+      const contract = await Contract.findByIdAndUpdate(
+        id,
+        { hidden: true },
+        { new: true }
+      );
+      if (!contract) {
+        throw new Error("Không tìm thấy hợp đồng để xóa.");
+      }
+      res.status(200).json({
+        message: "Hợp đồng đã được xóa thành công.",
+      });
+    } catch (error) {
+      res.status(400).json({ message: error.message });
     }
   }
 }

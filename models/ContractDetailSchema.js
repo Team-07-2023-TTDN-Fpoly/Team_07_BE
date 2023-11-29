@@ -20,6 +20,6 @@ const contractDetailSchema = new mongoose.Schema(
   }
 );
 
-// const contractDetail = mongoose.model("ContractDetail", contractDetailSchema);
+const contractDetail = mongoose.model("ContractDetail", contractDetailSchema);
 
-module.exports = contractDetailSchema;
+module.exports = contractDetail;

@@ -10,10 +10,6 @@ router.get("/", CustomerController.getAllCustomers);
 router.post("/", CustomerController.createCustomer);
 // Update Customer information
 router.put("/information/:id", CustomerController.updateCustomer);
-
+// Delete
+router.delete("/:id", CustomerController.deleteCustomer);
 module.exports = router;
-
-
-
-
-

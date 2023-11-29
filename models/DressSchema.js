@@ -12,6 +12,10 @@ const dressSchema = new Schema(
     dress_image: { type: String }, // Assuming this is a URL or path to an image
     dress_description: { type: String, default: "" },
     dress_status: { type: String, default: "Sẵn sàng" },
+    hidden: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

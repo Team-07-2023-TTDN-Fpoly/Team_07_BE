@@ -1,8 +1,12 @@
 const mongoose = require("mongoose");
 
-const dressTypeSchema = new  mongoose.Schema(
+const dressTypeSchema = new mongoose.Schema(
   {
     type_name: { type: String, required: true, maxlength: 50 },
+    hidden: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

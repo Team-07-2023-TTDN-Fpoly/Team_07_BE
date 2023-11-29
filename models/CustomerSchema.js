@@ -18,17 +18,21 @@ const customerSchema = new mongoose.Schema(
     cus_email: {
       type: String,
       required: true,
-      unique:true,
+      unique: true,
       lowercase: true,
     },
 
-    cus_birthday: {
+    cus_wedding_date: {
       type: Date,
       default: null,
     },
     cus_address: {
       type: String,
       default: "",
+    },
+    hidden: {
+      type: Boolean,
+      default: false,
     },
   },
   {

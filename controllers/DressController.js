@@ -1,6 +1,6 @@
 const Dress = require("../models/DressSchema.js");
 const cloudinary = require("cloudinary").v2;
-
+const { formatDressData } = require("../utils/FormatDressData.js");
 cloudinary.config({
   cloud_name: "dq1ojjdde",
   api_key: "418354474777134",
@@ -16,20 +16,10 @@ const DressController = {
           model: "DressType",
         })
         .lean();
-      const responseData = {
-        id: dress._id,
-        dress_name: dress.dress_name,
-        dress_price: dress.dress_price,
-        size: dress.size,
-        color: dress.color,
-        dress_image: dress.dress_image,
-        dress_description: dress.dress_description,
-        dress_status: dress.dress_status,
-        dressTypeId: {
-          type_id: dress.dressTypeId._id,
-          type_name: dress.dressTypeId.type_name,
-        },
-      };
+      if (!dress || dress.hidden) {
+        return res.status(400).json({ message: "Không tìm thấy áo cưới!" });
+      }
+      const responseData = formatDressData(dress);
       res.status(200).json({
         data: responseData,
       });
@@ -38,28 +28,22 @@ const DressController = {
     }
   },
   getAllDresses: async (req, res) => {
+    const { search } = req.query;
     try {
-      const dresses = await Dress.find()
+      let query = { hidden: false };
+      //Tìm kiếm theo tên
+      if (search) {
+        query.dress_name = { $regex: search, $options: "i" }; // 'i' không phân biệt hoa thường
+      }
+      //
+      const dresses = await Dress.find(query)
         .populate({
           path: "dressTypeId",
           model: "DressType",
         })
         .lean();
       const list = dresses.map((dress) => {
-        return {
-          id: dress._id,
-          dress_name: dress.dress_name,
-          dress_price: dress.dress_price,
-          size: dress.size,
-          color: dress.color,
-          dress_image: dress.dress_image,
-          dress_description: dress.dress_description,
-          dress_status: dress.dress_status,
-          dressTypeId: {
-            type_id: dress.dressTypeId._id,
-            type_name: dress.dressTypeId.type_name,
-          },
-        };
+        return formatDressData(dress);
       });
       res.status(200).json({ data: list });
     } catch (error) {
@@ -142,19 +126,16 @@ const DressController = {
 
   deleteDress: async (req, res) => {
     try {
-      const dress = await Dress.findById(req.params.id);
+      const dress = await Dress.findByIdAndUpdate(
+        req.params.id,
+        { hidden: true },
+        { new: true }
+      );
       if (!dress) {
         return res.status(400).json({ message: "Áo cưới không tồn tại!" });
       }
-      // Đối với việc xóa ảnh, bạn cần lấy public_id từ URL
-      const parts = dress.dress_image.split("/");
-      const fileName = parts.pop(); // Lấy phần cuối cùng của URL
-      const publicId = fileName.split(".")[0]; // Loại bỏ phần mở rộng
 
-      await cloudinary.uploader.destroy(publicId);
-
-      await dress.remove();
-      res.json({ message: "Dress removed" });
+      res.status(200).json({ message: "Áo cưới đã được xóa" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
