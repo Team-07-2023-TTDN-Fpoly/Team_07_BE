@@ -48,48 +48,80 @@ class AuthenticationController {
       res.status(400).json({ message: error.message });
     }
   }
+  //Hàm thay đổi mật khẩu cá nhân
+  static async changePassword(req, res) {
+    const { id } = req.params;
+    const { currentPassword, newPassword, confirmNewPassword } = req.body;
+    try {
+        const auth = await Authentication.findById(id);
+        if (!auth) {
+            return res.status(404).json({ message: "Người dùng không tồn tại." });
+        }
+
+        // Kiểm tra mật khẩu hiện tại
+        const check = await bcrypt.compare(currentPassword, auth.hash_password);
+        if (!check) {
+            return res.status(401).json({ message: "Mật khẩu hiện tại không đúng." });
+        }
+
+        // Kiểm tra mật khẩu mới và xác nhận mật khẩu mới
+        if (newPassword !== confirmNewPassword) {
+            return res.status(400).json({ message: "Xác nhận mật khẩu mới không khớp." });
+        }
+
+        // Tạo hash mới cho mật khẩu mới
+        const salt = bcrypt.genSaltSync(10);
+        const hashPassword = bcrypt.hashSync(newPassword, salt);
+
+        auth.hash_password = hashPassword;
+        auth.salt = salt;
+        await auth.save();
+
+        res.status(200).json({ message: "Mật khẩu đã được thay đổi thành công." });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error.message });
+    }
+}
+
+
   // Đăng nhập tài khoản
   static async loginAccount(req, res) {
+    const { email, password } = req.body;
+    console.log(req.body)
     try {
-      const { email, password } = req.body;
       //check email
       const auth = await Authentication.findOne({ email: email });
       if (!auth) {
         return res.status(401).json({ message: "Email không đúng." });
       }
       //check mật khẩu
-      const hash_password = bcrypt.hashSync(password, auth.salt);
-      const check = bcrypt.compare(hash_password, auth.hash_password);
-
+      const check = await bcrypt.compare(password, auth.hash_password);
       if (!check) {
         return res.status(401).json({ message: "Mật khẩu không đúng." });
       }
 
-      const user = await Authentication.findOne({
-        emp_id: auth.emp_id,
-      }).populate({
-        path: "emp_id",
-        select:
-          "emp_name emp_phone emp_address emp_birthday role workShiftId join_date basic_salary", // chỉ định các trường bạn muốn lấy từ Employee
-        populate: {
-          path: "workShiftId",
-          model: "WorkShift",
-        },
-      });
-
       // Kiểm tra xem tài khoản có bị vô hiệu hóa không
-      if (user.is_disable) {
+      if (auth.is_disable) {
         return res
           .status(400)
           .json({ message: "Tài khoản của bạn đã bị vô hiệu hóa!" });
       }
 
+      const user = await auth.populate({
+        path: "emp_id",
+        model: "Employee",
+        populate: {
+          path: "workShiftId",
+          model: "WorkShift",
+        },
+      });
       // Nếu tài khoản hợp lệ, lưu thông tin nhân viên vào session
       const employeeData = formatEmployeeData(user);
       req.session.user = employeeData;
       res.status(200).json({ data: employeeData });
-    } catch {
-      console.error(error);
+    } catch (error) {
+      console.log(error);
       return res.status(500).json({ message: "Đã xảy ra lỗi khi đăng nhập." });
     }
   }
