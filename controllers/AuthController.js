@@ -48,10 +48,62 @@ class AuthenticationController {
       res.status(400).json({ message: error.message });
     }
   }
+  //Hàm thay đổi mật khẩu cá nhân
+  static async changePassword(req, res) {
+    const { oldPassword, newPassword, checkPassword } = req.body;
+    try {
+      //Kiểm tra thông tin nhập vào
+      if (!oldPassword) {
+        return res.status(400).json({ message: "Vui lòng nhập mật khẩu!" });
+      }
+      if (!newPassword) {
+        return res.status(400).json({ message: "Vui lòng nhập mật khẩu mới!" });
+      }
+      if (newPassword.length < 6) {
+        return res
+          .status(400)
+          .json({ message: "Mật khẩu phải từ 6 kí tự trở lên!" });
+      }
+      if (!checkPassword || newPassword != checkPassword) {
+        return res
+          .status(400)
+          .json({ message: "Vui lòng xác nhận lại mật khẩu mới!" });
+      }
+
+      //Lấy thông tin
+      const user = await Authentication.findOne({ emp_id: req.session.userId });
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({ message: "Không tìm thấy tài khoản đăng nhập!" });
+      }
+      if (!(await bcrypt.compare(oldPassword, user.hash_password))) {
+        return res
+          .status(404)
+          .json({ message: "Mật khẩu cũ không chính xác!" });
+      }
+      // Tạo hash_password và salt
+      const salt = await bcrypt.genSalt(16);
+      const hash_password = await bcrypt.hash(newPassword, salt);
+
+      await Authentication.findByIdAndUpdate(user._id, {
+        hash_password: hash_password,
+      });
+
+      res.status(200).json({ message: "Thay đổi mật khẩu thành công!" });
+    } catch (error) {
+      console.log("Lỗi khi đổi mật khẩu bản thân", error);
+      res.status(400).json({ message: error.message });
+    }
+}
+
+
   // Đăng nhập tài khoản
   static async loginAccount(req, res) {
+    const { email, password } = req.body;
+    console.log(req.body)
     try {
-      const { email, password } = req.body;
       //check email
       const auth = await Authentication.findOne({ email: email });
       if (!auth) {

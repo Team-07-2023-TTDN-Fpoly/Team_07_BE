@@ -21,4 +21,7 @@ router.put(
 );
 //đăng nhập tài khoản
 router.post("/login", AuthController.loginAccount);
+//thay đổi mật khẩu cá nhân
+router.put("/password/:id",AuthMiddleware, AuthController.changePassword)
+
 module.exports = router;
