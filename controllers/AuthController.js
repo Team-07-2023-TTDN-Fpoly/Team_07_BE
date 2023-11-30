@@ -16,13 +16,12 @@ class AuthenticationController {
       const hash_password = bcrypt.hashSync(newPassword, salt);
 
       auth.hash_password = hash_password;
-      auth.salt = salt;
       await auth.save();
       res
         .status(200)
         .json({ message: "Mật khẩu đã được thay đổi thành công." });
     } catch (error) {
-      console.log(error);
+      console.log("Lỗi khi quản lý thay đổi mật khẩu", error);
       res.status(400).json({ message: error.message });
     }
   }
@@ -44,7 +43,8 @@ class AuthenticationController {
         message: `Tài khoản đã thay đổi thành công.`,
       });
     } catch (error) {
-      console.log(error);
+      console.log(`Lỗi vô hiệu hóa tài khoản`, error);
+
       res.status(400).json({ message: error.message });
     }
   }
@@ -66,7 +66,7 @@ class AuthenticationController {
       // Kiểm tra xem tài khoản có bị vô hiệu hóa không
       if (auth.is_disable) {
         return res
-          .status(400)
+          .status(403)
           .json({ message: "Tài khoản của bạn đã bị vô hiệu hóa!" });
       }
 
@@ -80,10 +80,13 @@ class AuthenticationController {
       });
       // Nếu tài khoản hợp lệ, lưu thông tin nhân viên vào session
       const employeeData = formatEmployeeData(user);
-      req.session.user = employeeData;
+      //Lưu thông tin vào session
+      req.session.userId = employeeData.emp_id;
+      //
       res.status(200).json({ data: employeeData });
     } catch (error) {
-      console.log(error);
+      console.log(`Lỗi đăng nhập`, error);
+
       return res.status(500).json({ message: "Đã xảy ra lỗi khi đăng nhập." });
     }
   }

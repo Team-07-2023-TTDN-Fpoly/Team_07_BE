@@ -11,6 +11,8 @@ router.put(
   AdminMiddleware,
   AuthController.adminChangePassword
 );
+
+//Vô hiệu hóa tài khoản
 router.put(
   "/change/disable/:id",
   AuthMiddleware,

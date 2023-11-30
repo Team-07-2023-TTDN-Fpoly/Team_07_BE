@@ -38,14 +38,13 @@ const AdminMiddleware = require("./middleware/AdminMiddleware.js");
 
 //
 app.use("/api/auth", AuthRouter);
-app.use("/api/employee", EmployeeRouter);
+app.use("/api/employee", AuthMiddleware, AdminMiddleware, EmployeeRouter);
 app.use("/api/workshift", WorkShiftRouter);
 app.use("/api/customer", CustomerRouter);
 
 app.use("/api/dresses", DressRouter);
 app.use("/api/dresstype", DressTypeRouter);
 app.use("/api/contract", ContractRouter);
-
 
 //Chạy mongoose
 dbConfig();
