@@ -16,7 +16,6 @@ class AuthenticationController {
       const hash_password = bcrypt.hashSync(newPassword, salt);
 
       auth.hash_password = hash_password;
-      auth.salt = salt;
       await auth.save();
       res
         .status(200)
