@@ -49,37 +49,51 @@ class AuthenticationController {
   }
   //Hàm thay đổi mật khẩu cá nhân
   static async changePassword(req, res) {
-    const { id } = req.params;
-    const { currentPassword, newPassword, confirmNewPassword } = req.body;
+    const { oldPassword, newPassword, checkPassword } = req.body;
     try {
-        const auth = await Authentication.findById(id);
-        if (!auth) {
-            return res.status(404).json({ message: "Người dùng không tồn tại." });
-        }
+      //Kiểm tra thông tin nhập vào
+      if (!oldPassword) {
+        return res.status(400).json({ message: "Vui lòng nhập mật khẩu!" });
+      }
+      if (!newPassword) {
+        return res.status(400).json({ message: "Vui lòng nhập mật khẩu mới!" });
+      }
+      if (newPassword.length < 6) {
+        return res
+          .status(400)
+          .json({ message: "Mật khẩu phải từ 6 kí tự trở lên!" });
+      }
+      if (!checkPassword || newPassword != checkPassword) {
+        return res
+          .status(400)
+          .json({ message: "Vui lòng xác nhận lại mật khẩu mới!" });
+      }
 
-        // Kiểm tra mật khẩu hiện tại
-        const check = await bcrypt.compare(currentPassword, auth.hash_password);
-        if (!check) {
-            return res.status(401).json({ message: "Mật khẩu hiện tại không đúng." });
-        }
+      //Lấy thông tin
+      const user = await Authentication.findOne({ emp_id: req.session.userId });
 
-        // Kiểm tra mật khẩu mới và xác nhận mật khẩu mới
-        if (newPassword !== confirmNewPassword) {
-            return res.status(400).json({ message: "Xác nhận mật khẩu mới không khớp." });
-        }
+      if (!user) {
+        return res
+          .status(404)
+          .json({ message: "Không tìm thấy tài khoản đăng nhập!" });
+      }
+      if (!(await bcrypt.compare(oldPassword, user.hash_password))) {
+        return res
+          .status(404)
+          .json({ message: "Mật khẩu cũ không chính xác!" });
+      }
+      // Tạo hash_password và salt
+      const salt = await bcrypt.genSalt(16);
+      const hash_password = await bcrypt.hash(newPassword, salt);
 
-        // Tạo hash mới cho mật khẩu mới
-        const salt = bcrypt.genSaltSync(10);
-        const hashPassword = bcrypt.hashSync(newPassword, salt);
+      await Authentication.findByIdAndUpdate(user._id, {
+        hash_password: hash_password,
+      });
 
-        auth.hash_password = hashPassword;
-        auth.salt = salt;
-        await auth.save();
-
-        res.status(200).json({ message: "Mật khẩu đã được thay đổi thành công." });
+      res.status(200).json({ message: "Thay đổi mật khẩu thành công!" });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: error.message });
+      console.log("Lỗi khi đổi mật khẩu bản thân", error);
+      res.status(400).json({ message: error.message });
     }
 }
 
