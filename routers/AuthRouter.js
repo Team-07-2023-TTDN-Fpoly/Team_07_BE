@@ -11,6 +11,8 @@ router.put(
   AdminMiddleware,
   AuthController.adminChangePassword
 );
+
+//Vô hiệu hóa tài khoản
 router.put(
   "/change/disable/:id",
   AuthMiddleware,
@@ -19,4 +21,7 @@ router.put(
 );
 //đăng nhập tài khoản
 router.post("/login", AuthController.loginAccount);
+//thay đổi mật khẩu cá nhân
+router.put("/password/:id",AuthMiddleware, AuthController.changePassword)
+
 module.exports = router;

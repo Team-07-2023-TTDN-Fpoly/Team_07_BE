@@ -12,11 +12,6 @@ const authenticationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    salt: {
-      type: String,
-      required: true,
-      maxlength: 250,
-    },
     emp_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Employee", //Tham chiếu tới bảng Employee
