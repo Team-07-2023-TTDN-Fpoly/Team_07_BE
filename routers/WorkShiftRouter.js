@@ -9,7 +9,7 @@ router.get("/", WorkShiftController.getAllWorkShift);
 //create new WorkShift
 router.post("/", WorkShiftController.createWorkShift);
 //update information WorkShift
-router.put("/:id", WorkShiftController.updateWorkShift);
+router.put("/information/:id", WorkShiftController.updateWorkShift);
 //delete WorkShift
 router.delete("/:id", WorkShiftController.deleteWorkShift);
 module.exports = router;
