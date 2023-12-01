@@ -30,7 +30,7 @@ class DressTypeController {
         { new: true }
       );
       if (!dressType) {
-        return res.status(404).json({ message: "Ca làm không tồn tại" });
+        return res.status(404).json({ message: "Loại không tồn tại" });
       }
       res.status(200).json({ message: "Cập nhật thành công!" });
     } catch (error) {
@@ -44,7 +44,7 @@ class DressTypeController {
       //Tìm kiếm các loại áo đang còn được sử dụng
       let query = { hidden: false };
       if (search) {
-        query.type_name = { $regex: search,$options: "i" }; // 'i' không phân biệt hoa thường
+        query.type_name = { $regex: search,$options: "i" }; 
       }
 
       const dressTypes = await DressType.find(query);

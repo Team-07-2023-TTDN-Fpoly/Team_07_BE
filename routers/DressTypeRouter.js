@@ -9,7 +9,7 @@ router.get("/", DressTypeController.getAllDressType);
 //create new DressType
 router.post("/", DressTypeController.createDressType);
 //update information DressType
-router.put("/:id", DressTypeController.updateDressType);
+router.put("/information/:id", DressTypeController.updateDressType);
 //Delete DressType
 router.delete("/:id", DressTypeController.deleteDressType);
 
