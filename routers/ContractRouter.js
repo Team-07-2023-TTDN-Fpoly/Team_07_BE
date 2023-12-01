@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const ContractController = require("../controllers/ContractController.js");
+const AdminMiddleware = require("../middleware/AdminMiddleware.js");
 
 // Routes
 //get one contract
@@ -12,6 +13,6 @@ router.post("/", ContractController.createContract);
 //thay đổi thông tin một contract
 // router.put("/:id", ContractController.updateContract);
 //xóa một contract
-router.delete("/:id", ContractController.deleteContract);
+router.delete("/:id",AdminMiddleware, ContractController.deleteContract);
 
 module.exports = router;
