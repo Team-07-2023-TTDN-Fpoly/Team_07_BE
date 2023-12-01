@@ -54,7 +54,7 @@ class WorkShiftController {
         query.name = { $regex: search, $options: "i" }; // 'i' không phân biệt hoa thường
       }
       //
-      const workShifts = await WorkShift.find();
+      const workShifts = await WorkShift.find(query);
       const list = workShifts.map((workShift) => {
         return {
           shift_id: workShift.id,
@@ -91,15 +91,12 @@ class WorkShiftController {
   }
   static async deleteWorkShift(req, res) {
     try {
-      const dress = await WorkShift.findByIdAndUpdate(
-        req.params.id,
-        { hidden: true },
-        { new: true }
-      );
-      if (!dress) {
+      const workShift = await WorkShift.findByIdAndUpdate(req.params.id, {
+        hidden: true,
+      },{new :true});
+      if (!workShift) {
         return res.status(400).json({ message: "Ca làm không tồn tại!" });
       }
-
       res.status(200).json({ message: "Ca làm đã được xóa" });
     } catch (error) {
       res.status(500).json({ message: error.message });

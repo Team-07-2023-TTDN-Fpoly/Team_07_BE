@@ -33,19 +33,19 @@ const CustomerRouter = require("./routers/CustomerRouter.js");
 const DressRouter = require("./routers/DressRouter.js");
 const DressTypeRouter = require("./routers/DressTypeRouter.js");
 const ContractRouter = require("./routers/ContractRouter.js");
+const DetailStatisticsRouter = require("./routers/DetailStatisticsRouter");
 const AuthMiddleware = require("./middleware/AuthMiddleware.js");
 const AdminMiddleware = require("./middleware/AdminMiddleware.js");
 
 //
 app.use("/api/auth", AuthRouter);
-app.use("/api/employee", EmployeeRouter);
+app.use("/api/employee", AuthMiddleware, AdminMiddleware, EmployeeRouter);
 app.use("/api/workshift", WorkShiftRouter);
 app.use("/api/customer", CustomerRouter);
-
+app.use("/api/detailstatistics", DetailStatisticsRouter);
 app.use("/api/dresses", DressRouter);
 app.use("/api/dresstype", DressTypeRouter);
 app.use("/api/contract", ContractRouter);
-
 
 //Chạy mongoose
 dbConfig();

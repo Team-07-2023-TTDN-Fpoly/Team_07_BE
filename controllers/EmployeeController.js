@@ -60,7 +60,6 @@ class EmployeeController {
       await new Authentication({
         email,
         hash_password,
-        salt,
         emp_id: employee._id, // Tham chiếu ID của Employee mới tạo
         is_disable: false,
       }).save({ session });
@@ -167,7 +166,6 @@ class EmployeeController {
       });
       // Xây dựng danh sách thông tin nhân viên với thông tin xác thực
       const employeeList = authList.map((auth) => {
-        console.log(auth);
         return formatEmployeeData(auth);
       });
       res.status(200).json({ data: employeeList });
