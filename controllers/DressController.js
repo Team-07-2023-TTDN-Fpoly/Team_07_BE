@@ -60,9 +60,9 @@ const DressController = {
       size,
       color,
       dress_description,
+      dress_status,
     } = req.body;
     try {
-      console.log(req.file);
       if (!dress_name) {
         throw new Error("Vui lòng nhập tên!");
       }
@@ -75,12 +75,12 @@ const DressController = {
       const dressData = {
         dress_name: dress_name,
         dressTypeId: dressTypeId,
-        dress_price: dress_price,
+        dress_price: Number(dress_price),
         size: size,
         color: color,
         dress_description: dress_description,
+        dress_status: dress_status || "Sẵn sàng",
       };
-
       if (!req.file) {
         throw new Error("Vui lòng chọn ảnh");
       }
@@ -90,6 +90,7 @@ const DressController = {
       const savedDress = await newDress.save();
       res.status(201).json({ data: savedDress._id });
     } catch (error) {
+      console.log("error add",error.message);
       if (req.file && req.file.path) {
         await cloudinary.uploader.destroy(req.file.filename);
       }
