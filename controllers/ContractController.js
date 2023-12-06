@@ -124,6 +124,7 @@ class ContractController {
       });
       res.status(200).json({ data: list });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ message: error.message });
     }
   }

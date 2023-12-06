@@ -5,7 +5,7 @@ const { formatCustomerData } = require("./FormatCustomerData.js");
 function formatContractData(contract) {
   return {
     ...contract,
-    cus_id: formatCustomerData(contract.cus_id),
+    cus_id: contract.cus_id ? formatCustomerData(contract.cus_id) : null,
     contract_details: contract.contract_details.map((contract_detail) => {
       return {
         ...contract_detail,
