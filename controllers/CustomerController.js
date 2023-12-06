@@ -138,13 +138,12 @@ const CustomerController = {
       }
       //
       // Lấy tất cả bản ghi từ Customer
-      const customerList = await Customer.find(query);
+      const customerList = await Customer.find(query).sort({ createdAt: -1 });
 
       // Xây dựng danh sách khách hàng
       const formattedCustomerList = customerList.map((customer) => {
         return formatCustomerData(customer);
       });
-
       res.status(200).json({ data: formattedCustomerList });
     } catch (error) {
       res.status(400).json({ message: error.message });

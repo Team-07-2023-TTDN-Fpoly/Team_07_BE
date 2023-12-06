@@ -156,7 +156,7 @@ class EmployeeController {
         filter["emp_id"] = { $in: employeeIds };
       }
       // Lấy tất cả bản ghi từ Authentication và populate thông tin Employee
-      const authList = await Authentication.find(filter).populate({
+      const authList = await Authentication.find(filter).sort({ createdAt: -1 }).populate({
         path: "emp_id",
         model: "Employee",
         populate: {

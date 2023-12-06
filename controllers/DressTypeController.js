@@ -47,7 +47,7 @@ class DressTypeController {
         query.type_name = { $regex: search,$options: "i" }; 
       }
 
-      const dressTypes = await DressType.find(query);
+      const dressTypes = await DressType.find(query).sort({ createdAt: -1 });
       const list = dressTypes.map((dressType) => {
         return {
           type_id: dressType._id,

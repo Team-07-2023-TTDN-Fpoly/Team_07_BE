@@ -54,7 +54,7 @@ class WorkShiftController {
         query.name = { $regex: search, $options: "i" }; // 'i' không phân biệt hoa thường
       }
       //
-      const workShifts = await WorkShift.find(query);
+      const workShifts = await WorkShift.find(query).sort({ createdAt: -1 });
       const list = workShifts.map((workShift) => {
         return {
           shift_id: workShift.id,
