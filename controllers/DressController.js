@@ -37,6 +37,7 @@ const DressController = {
       }
       //
       const dresses = await Dress.find(query)
+        .sort({ createdAt: -1 })
         .populate({
           path: "dressTypeId",
           model: "DressType",
@@ -60,9 +61,13 @@ const DressController = {
       size,
       color,
       dress_description,
+      dress_status,
     } = req.body;
     try {
-      console.log(req.file);
+      if (!req.file) {
+        throw new Error("Vui lòng chọn ảnh");
+      }
+
       if (!dress_name) {
         throw new Error("Vui lòng nhập tên!");
       }
@@ -75,25 +80,23 @@ const DressController = {
       const dressData = {
         dress_name: dress_name,
         dressTypeId: dressTypeId,
-        dress_price: dress_price,
+        dress_price: Number(dress_price),
         size: size,
         color: color,
         dress_description: dress_description,
+        dress_status: dress_status || "Sẵn sàng",
+        dress_image: req.file.path,
       };
 
-      if (!req.file) {
-        throw new Error("Vui lòng chọn ảnh");
-      }
-      dressData.dress_image = req.file.path;
-
-      const newDress = new Dress(dressData);
-      const savedDress = await newDress.save();
-      res.status(201).json({ data: savedDress._id });
+      const newDress = new Dress(dressData).save();
+      console.log(newDress);
+      res.status(201).json({ data: newDress._id });
     } catch (error) {
-      if (req.file && req.file.path) {
+      console.log("error add", error.message);
+      if (req.file) {
         await cloudinary.uploader.destroy(req.file.filename);
       }
-      res.status(400).json({ message: error.message });
+      res.status(400).json({ message: error });
     }
   },
 
@@ -103,21 +106,36 @@ const DressController = {
     try {
       const dress = await Dress.findById(req.params.id);
       if (!dress) {
-        throw new Error("Áo cưới không tồn tại!");
+        return res.status(404).json({ message: "Không tìm thấy chiếc váy" });
       }
-      if (updateData.dress_price && isNaN(updateData.dress_price)) {
+      if (updateData.dress_name && updateData.dress_name === "") {
+        throw new Error("Vui lòng nhập tên!");
+      }
+      if (updateData.dress_price !== undefined) {
         // Sửa đổi điều kiện này
-        throw new Error("Giá cả phải là số!");
+        updateData.dress_price = Number(updateData.dress_price);
       }
       if (req.file) {
+        if (dress.dress_image) {
+          // Trích xuất tên tệp ảnh từ đường dẫn
+          const imagePathParts = dress.dress_image.split("/");
+          const imageName = imagePathParts[imagePathParts.length - 1];
+          // Sử dụng tên tệp ảnh để xóa ảnh
+          cloudinary.uploader.destroy(imageName);
+          // Xóa ảnh cũ bằng tên tệp ảnh
+        }
         updateData.dress_image = req.file.path;
       }
 
-      await Dress.findByIdAndUpdate(req.params.id, updateData, { new: true });
+      await Dress.findByIdAndUpdate(
+        req.params.id,
+        { $set: updateData },
+        { new: true }
+      );
 
       res.status(200).json({ message: "Cập nhật thành công!" });
     } catch (error) {
-      if (req.file && req.file.path) {
+      if (req.file) {
         await cloudinary.uploader.destroy(req.file.filename);
       }
       res.status(400).json({ message: error.message });

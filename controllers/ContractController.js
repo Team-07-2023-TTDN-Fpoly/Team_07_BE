@@ -92,6 +92,7 @@ class ContractController {
       // }
 
       const listContract = await Contract.find(filter)
+        .sort({ createdAt: -1 })
         .populate({ path: "cus_id", model: "Customer" })
         .populate({
           path: "emp_id",
