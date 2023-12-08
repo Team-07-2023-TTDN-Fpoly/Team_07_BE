@@ -4,6 +4,7 @@ const Dress = require("../models/DressSchema.js");
 const Customer = require("../models/CustomerSchema.js");
 
 const { formatContractData } = require("../utils/FormatContractData");
+const Authentication = require("../models/AuthenticationSchema.js");
 class ContractController {
   //Tạo mới contract
   static async createContract(req, res) {
@@ -48,14 +49,18 @@ class ContractController {
       );
       const totalAmount = prices.reduce((total, price) => total + price, 0);
 
+      const employee = await Authentication.findOne({
+        emp_id: req.session.userId,
+      });
+      
       // Tạo Contract mới
       const newContract = new Contract({
         cus_id: cus_id,
-        emp_id: auth_id,
+        emp_id: auth_id || employee._id,
         contract_details: savedDetails.map((detail) => detail._id),
         createAt: createAt,
         endAt: endAt,
-        total_amount: total_amount || totalAmount,
+        total_amount: new Number(total_amount) || totalAmount,
         prepay: prepay || 0,
         discount: discount || 0,
         contract_status: contract_status || "Chưa thanh toán",
@@ -63,8 +68,10 @@ class ContractController {
       });
 
       const savedContract = await newContract.save();
-      res.status(201).json({ contract: savedContract._id });
+      console.log(savedContract);
+      res.status(201).json({ data: savedContract._id });
     } catch (err) {
+      console.log(err);
       res.status(500).json({ message: err.message });
     }
   }
