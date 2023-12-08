@@ -40,7 +40,7 @@ const AdminMiddleware = require("./middleware/AdminMiddleware.js");
 //
 app.use("/api/auth", AuthRouter);
 app.use(AuthMiddleware);
-app.use("/api/employee", AdminMiddleware, EmployeeRouter);
+app.use("/api/employee", EmployeeRouter);
 app.use("/api/workshift", WorkShiftRouter);
 app.use("/api/customer", CustomerRouter);
 app.use("/api/detailstatistics", DetailStatisticsRouter);
