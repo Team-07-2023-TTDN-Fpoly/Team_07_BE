@@ -39,12 +39,13 @@ const AdminMiddleware = require("./middleware/AdminMiddleware.js");
 
 //
 app.use("/api/auth", AuthRouter);
-app.use("/api/employee", AuthMiddleware, AdminMiddleware, EmployeeRouter);
-app.use("/api/workshift", AuthMiddleware, WorkShiftRouter);
+app.use(AuthMiddleware);
+app.use("/api/employee", AdminMiddleware, EmployeeRouter);
+app.use("/api/workshift", WorkShiftRouter);
 app.use("/api/customer", CustomerRouter);
 app.use("/api/detailstatistics", DetailStatisticsRouter);
 app.use("/api/dresses", DressRouter);
-app.use("/api/dresstype", AuthMiddleware, DressTypeRouter);
+app.use("/api/dresstype", DressTypeRouter);
 app.use("/api/contract", ContractRouter);
 
 //Chạy mongoose
