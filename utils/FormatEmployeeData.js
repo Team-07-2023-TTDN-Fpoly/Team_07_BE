@@ -1,6 +1,6 @@
 function formatEmployeeData(auth) {
   const employeeData =
-    auth.emp_id && auth.emp_id._doc ? auth.emp_id._doc : auth.emp_id || {};
+    auth.emp_id || {};
   return {
     emp_name: employeeData.emp_name,
     emp_phone: employeeData.emp_phone,

@@ -32,6 +32,10 @@ class AuthenticationController {
       const { id } = req.params;
       const { disable } = req.body; // Giá trị boolean để biết là disable hay enable tài khoản
 
+      const auth = await Authentication.findOne({emp_id: req.session.userId})
+      if(id === auth.id){
+        return res.status(400).json({message:'Bạn không thể vô hiệu hóa tài khoản!'})
+      }
       const user = await Authentication.findByIdAndUpdate(id, {
         is_disable: disable,
       });

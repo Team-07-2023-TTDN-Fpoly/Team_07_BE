@@ -88,9 +88,10 @@ const DressController = {
         dress_image: req.file.path,
       };
 
-      const newDress = new Dress(dressData).save();
-      console.log(newDress);
-      res.status(201).json({ data: newDress._id });
+      const newDress = new Dress(dressData);
+      const save = await newDress.save();
+      console.log(save._id);
+      res.status(201).json({ data: save._id });
     } catch (error) {
       console.log("error add", error.message);
       if (req.file) {
