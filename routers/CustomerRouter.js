@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const CustomerController = require("../controllers/CustomerController.js");
+const AdminMiddleware = require('../middleware/AdminMiddleware.js')
 
 // Get one Customer
 router.get("/:id", CustomerController.getCustomerById);
@@ -11,5 +12,5 @@ router.post("/", CustomerController.createCustomer);
 // Update Customer information
 router.put("/information/:id", CustomerController.updateCustomer);
 // Delete
-router.delete("/:id", CustomerController.deleteCustomer);
+router.delete("/:id",AdminMiddleware, CustomerController.deleteCustomer);
 module.exports = router;
