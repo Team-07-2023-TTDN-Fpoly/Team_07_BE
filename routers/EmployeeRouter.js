@@ -6,7 +6,7 @@ const AdminMiddleware = require('../middleware/AdminMiddleware.js')
 //Get one Employee
 router.get("/:id", EmployeeController.getEmployeeById);
 //Get all Employee
-router.get("/", EmployeeController.getAllEmployees);
+router.get("/",AdminMiddleware, EmployeeController.getAllEmployees);
 //create new Employee
 router.post("/",AdminMiddleware, EmployeeController.createEmployeeAndUser);
 //update information Employee
